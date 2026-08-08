@@ -1,7 +1,9 @@
 from fastapi import FastAPI
 
 from backend.app.api.routes import router
+from backend.app.api.documents import router as documents_router
 from backend.app.core.config import settings
+
 
 app = FastAPI(
     title=settings.APP_NAME,
@@ -9,3 +11,4 @@ app = FastAPI(
 )
 
 app.include_router(router)
+app.include_router(documents_router)
