@@ -8,6 +8,9 @@ from backend.app.services.pdf_service import (
     get_pdf_metadata,
 )
 
+from backend.app.services.document_service import create_document_chunks
+
+
 router = APIRouter(prefix="/api/documents", tags=["Documents"])
 
 UPLOAD_DIR = Path("data/uploads")
@@ -53,8 +56,8 @@ async def upload_document(file: UploadFile = File(...)):
     }
 
 
-@router.get("/{document_id}")
-async def get_document(document_id: str):
+@router.get("/{document_id}/chunks")
+async def get_document_chunks(document_id: str):
     matches = list(UPLOAD_DIR.glob(f"{document_id}_*.pdf"))
 
     if not matches:
@@ -65,13 +68,15 @@ async def get_document(document_id: str):
 
     pdf_path = matches[0]
 
-    metadata = get_pdf_metadata(pdf_path)
     pages = extract_text_from_pdf(pdf_path)
+
+    chunks = create_document_chunks(
+        document_id=document_id,
+        pages=pages,
+    )
 
     return {
         "document_id": document_id,
-        "filename": pdf_path.name,
-        "page_count": metadata["page_count"],
-        "metadata": metadata["metadata"],
-        "pages": pages,
+        "chunk_count": len(chunks),
+        "chunks": chunks,
     }
