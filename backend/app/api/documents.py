@@ -9,6 +9,8 @@ from backend.app.services.pdf_service import (
 )
 
 from backend.app.services.document_service import create_document_chunks
+from backend.app.services.vector_store import save_chunks
+
 
 
 router = APIRouter(prefix="/api/documents", tags=["Documents"])
@@ -74,7 +76,7 @@ async def get_document_chunks(document_id: str):
         document_id=document_id,
         pages=pages,
     )
-
+    save_chunks(chunks)
     return {
         "document_id": document_id,
         "chunk_count": len(chunks),
